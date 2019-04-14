@@ -6,13 +6,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -48,6 +51,8 @@ public class MultiChatSpigot extends JavaPlugin implements Listener {
 	public static Map<UUID, Set<UUID>> ignoreMap = new HashMap<UUID, Set<UUID>>();
 	public static Map<UUID, Boolean> colourMap = new HashMap<UUID, Boolean>();
 
+	public static Map<String, String> placeholderMap = new HashMap<String, String>();
+
 	public static Optional<Chat> getVaultChat() {
 		if (chat == null) return Optional.empty();
 		return Optional.of(chat);
@@ -77,6 +82,10 @@ public class MultiChatSpigot extends JavaPlugin implements Listener {
 	public static String localChatFormat = "&7&lLOCAL &f> &f%DISPLAYNAME%&f: ";
 	public static boolean setLocalFormat = false;
 	public static boolean forceMultiChatFormat = false;
+	
+	public static boolean showNicknamePrefix = false;
+	public static String nicknamePrefix = "~";
+	public static List<String> nicknameBlacklist = new ArrayList<String>();
 
 	@SuppressWarnings("unchecked")
 	public void onEnable() {
@@ -101,6 +110,22 @@ public class MultiChatSpigot extends JavaPlugin implements Listener {
 		setLocalFormat = config.getBoolean("set_local_format");
 		localChatFormat = config.getString("local_chat_format");
 		forceMultiChatFormat = config.getBoolean("force_multichat_format");
+
+		placeholderMap.clear();
+		ConfigurationSection placeholders = config.getConfigurationSection("multichat_placeholders");
+		if (placeholders != null) {
+
+			for (String placeholder : placeholders.getKeys(false)) {
+				placeholderMap.put("{multichat_" + placeholder + "}", placeholders.getString(placeholder));
+			}
+
+		}
+		
+		if (config.contains("show_nickname_prefix")) {
+			showNicknamePrefix = config.getBoolean("show_nickname_prefix");
+			nicknamePrefix = config.getString("nickname_prefix");
+			nicknameBlacklist = config.getStringList("nickname_blacklist");
+		}
 
 		File f = new File(configDir, nameDataFile);
 
@@ -220,6 +245,7 @@ public class MultiChatSpigot extends JavaPlugin implements Listener {
 
 		this.getCommand("nick").setExecutor(CommandHandler.getInstance());
 		this.getCommand("realname").setExecutor(CommandHandler.getInstance());
+		this.getCommand("username").setExecutor(CommandHandler.getInstance());
 		this.getCommand("multichatspigot").setExecutor(CommandHandler.getInstance());
 
 		// Manage dependencies

@@ -7,56 +7,51 @@
 # By Revilo410
 
 ##################
-# Ne pas éditer  #
-version: "1.7"   #
+# NE PAS EDITER  #
+version: "1.7.3" #
 ##################
 
-##############################################################
-#  +------------------------------------------------------+  #
-#  |                    Join Messages                     |  #
-#  +------------------------------------------------------+  #
-##############################################################
+# French Translation by Nogapra - Thank you !
+# Pour utiliser ce fichier, renommer en 'joinmessages.yml'.
+
+############################################################
+# +------------------------------------------------------+ #
+# |       Message de connexion / déconnexion             | #
+# +------------------------------------------------------+ #
+############################################################
 
 # Les messages de jonction réseau de serveur doivent-ils être affichés ?
 # Paramétrage disponible : true ou false
-
 showjoin: true
 
 # Les messages à la déconexion du réseau de serveur doivent-ils être affichés?
 # Paramétrage disponible : true ou false
-
 showquit: true
 
 ##############################################################
 
-# Utilisé les code couleur de minecraft Standard '&X' COLOUR/FORMAT CODES
+# Utiliser les codes couleur de minecraft standard '&X' COLOUR/FORMAT CODES.
 # %NAME% = le nom du joueur
 
-# Message de connexion sur le réseaux de serveur
+# Message de connexion sur le réseaux de serveur.
+serverjoin: "&e%NAME% &es'est connecté au réseau !"
 
-serverjoin: "%DYSPLAYNAME% &evient de se connecter"
+# Message de connexion silencieuse sur le réseaux de serveur.
+silentjoin: "&b&o%NAME% &b&os'est connecté au réseau silencieusement !"
 
-# Message de connexion silencieuse sur le réseaux de serveur
+# Message de déconnexion du réseau sur le réseaux de serveur.
+networkquit: "&e%NAME% &es'est déconnecté du réseau !"
 
-silentjoin: "%DISPLAYNAME% &b&os'est connecté silencieusement"
-
-# Message de déconexion du réseau sur le réseaux de serveur
-
-networkquit: "%DISPLAYNAME% &es'est déconnecté"
-
-# Message de déconnexion silencieuse sur le réseaux de serveur
-
-silentquit: "%DISPLAYNAME% &b&os'est déconnecté silencieusement"
+# Message de déconnexion silencieuse sur le réseaux de serveur.
+silentquit: "&b&o%NAME% &b&os'est déconnecté du réseau silencieusement !"
 
 ##############################################################
 
 # Un message de bienvenue doit-il être affiché la première fois qu'un joueur rejoint le réseau ?
 # Paramétrage disponible : true ou false
-
 welcome: true
 
-# définisser le message de bienvenue ci-dessous
-# Utilisé les code couleur de minecraft Standard '&X' COLOUR/FORMAT CODES
+# Définisser le message de bienvenue ci-dessous
+# Utiliser les codes couleur de minecraft Standard '&X' COLOUR/FORMAT CODES.
 # %NAME% = Le nom du joueur
-
-welcome_message: "&dBienvenue %NAME% pour votre première connexion sur nos serveur!"
+welcome_message: "&dBienvenue %NAME% pour votre première connexion sur nos serveurs !"

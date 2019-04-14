@@ -37,11 +37,14 @@ import net.md_5.bungee.event.EventHandler;
  */
 public class MultiChat extends Plugin implements Listener {
 
-	public static final String LATEST_VERSION = "1.7";
+	public static final String LATEST_VERSION = "1.7.3";
 
 	public static final String[] ALLOWED_VERSIONS = new String[] {
 
 			LATEST_VERSION,
+			"1.7.2",
+			"1.7.1",
+			"1.7",
 			"1.6.2",
 			"1.6.1",
 			"1.6",
@@ -72,7 +75,7 @@ public class MultiChat extends Plugin implements Listener {
 	public static String configversion;
 
 	public static boolean frozen;
-	
+
 	public static String defaultChannel = "";
 	public static boolean forceChannelOnJoin = false;
 
@@ -234,10 +237,19 @@ public class MultiChat extends Plugin implements Listener {
 			getDataFolder().mkdirs();
 		}
 
+		String translationsDir = configDir.toString() + File.separator + "translations";
+		if (!new File(translationsDir).exists()) {
+			System.out.println("[MultiChat] Creating translations directory!");
+			new File(translationsDir).mkdirs();
+		}
+
 		ConfigManager.getInstance().registerHandler("config.yml", configDir);
 		ConfigManager.getInstance().registerHandler("joinmessages.yml", configDir);
 		ConfigManager.getInstance().registerHandler("messages.yml", configDir);
 		ConfigManager.getInstance().registerHandler("chatcontrol.yml", configDir);
+
+		ConfigManager.getInstance().registerHandler("messages_fr.yml", new File(translationsDir));
+		ConfigManager.getInstance().registerHandler("joinmessages_fr.yml", new File(translationsDir));
 
 		Configuration configYML = ConfigManager.getInstance().getHandler("config.yml").getConfig();
 		Configuration chatcontrolYML = ConfigManager.getInstance().getHandler("chatcontrol.yml").getConfig();
@@ -283,6 +295,12 @@ public class MultiChat extends Plugin implements Listener {
 			Startup();
 			UUIDNameManager.Startup();
 			
+			// Set up chat control stuff
+			if (chatcontrolYML.contains("link_control")) {
+				ChatControl.controlLinks = chatcontrolYML.getBoolean("link_control");
+				ChatControl.linkMessage = chatcontrolYML.getString("link_removal_message");
+			}
+
 			// Set default channel
 			defaultChannel = configYML.getString("default_channel");
 			forceChannelOnJoin = configYML.getBoolean("force_channel_on_join");

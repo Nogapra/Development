@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -72,7 +73,7 @@ public class NameManager implements Listener {
 		mapNameFormatted = new HashMap<String,String>();
 
 	}
-
+	
 	/**
 	 * Returns the FORMATTED NICKNAME of a player if they have one set, otherwise returns their username
 	 * 
@@ -80,10 +81,25 @@ public class NameManager implements Listener {
 	 * @return The NICKNAME of the player if it is set, otherwise their username
 	 */
 	public String getCurrentName(UUID uuid) {
+		return getCurrentName(uuid, true);
+	}
+
+	/**
+	 * Returns the FORMATTED NICKNAME of a player if they have one set, otherwise returns their username
+	 * 
+	 * @param uuid The Unique ID of the player to lookup
+	 * @param withPrefix Should the nickname prefix also be returned if it is set?
+	 * @return The NICKNAME of the player if it is set, otherwise their username
+	 */
+	public String getCurrentName(UUID uuid, boolean withPrefix) {
 
 		synchronized (mapUUIDNick) {
 			if (mapUUIDNick.containsKey(uuid)) {
-				return mapNickFormatted.get(mapUUIDNick.get(uuid));
+				if (MultiChatSpigot.showNicknamePrefix && withPrefix) {
+					return MultiChatSpigot.nicknamePrefix + mapNickFormatted.get(mapUUIDNick.get(uuid));
+				} else {
+					return mapNickFormatted.get(mapUUIDNick.get(uuid));
+				}
 			} 
 		}
 
@@ -209,6 +225,28 @@ public class NameManager implements Listener {
 		UUID uuid = oUUID.get();
 
 		return Optional.of(getCurrentName(uuid));
+
+	}
+
+	/**
+	 * Gets a player's formatted name from their username
+	 * 
+	 * @param name The player's username
+	 * @return An optional value which may contain their name, as long as their username can be found
+	 */
+	public Optional<String> getFormattedNameFromName(String username) {
+
+		username = username.toLowerCase();
+
+		Optional<UUID> oUUID = getUUIDFromName(username);
+
+		if (!oUUID.isPresent()) {
+			return Optional.empty();
+		}
+
+		UUID uuid = oUUID.get();
+
+		return Optional.of(getName(uuid));
 
 	}
 
@@ -387,12 +425,69 @@ public class NameManager implements Listener {
 
 		if (!uuidSet.isEmpty()) return Optional.of(uuidSet);
 
-		for (String nick : nickSet) {
+		try {
+			for (String nick : nickSet) {
 
-			if (nick.matches(nickname)) {
-				uuidSet.add(mapNickUUID.get(nick));
+				if (nick.matches(nickname)) {
+					uuidSet.add(mapNickUUID.get(nick));
+				}
+
+			}
+		} catch (PatternSyntaxException e) {
+			/*
+			 * Its not a valid regex, so we will just say there are no matches!
+			 */
+		}
+
+		if (!uuidSet.isEmpty()) return Optional.of(uuidSet);
+
+		return Optional.empty();
+
+	}
+
+	/**
+	 * Return the UUIDs of players who have names containing characters provided in the name argument
+	 * @param name The characters of the name to check
+	 * @return An optional which might contain a players UUID if a partial match was found
+	 */
+	public Optional<Set<UUID>> getPartialNameMatches(String name) {
+
+		Set<String> nameSet = mapNameUUID.keySet();
+		name = stripAllFormattingCodes(name.toLowerCase());
+		Set<UUID> uuidSet = new HashSet<UUID>();
+
+		for (String n : nameSet) {
+
+			if (n.startsWith(name)) {
+				uuidSet.add(mapNameUUID.get(n));
 			}
 
+		}
+
+		if (!uuidSet.isEmpty()) return Optional.of(uuidSet);
+
+		for (String n : nameSet) {
+
+			if (n.contains(name)) {
+				uuidSet.add(mapNameUUID.get(n));
+			}
+
+		}
+
+		if (!uuidSet.isEmpty()) return Optional.of(uuidSet);
+
+		try {
+			for (String n : nameSet) {
+
+				if (n.matches(name)) {
+					uuidSet.add(mapNameUUID.get(n));
+				}
+
+			}
+		} catch (PatternSyntaxException e) {
+			/*
+			 * Its not a valid regex, so we will just say there are no matches!
+			 */
 		}
 
 		if (!uuidSet.isEmpty()) return Optional.of(uuidSet);
